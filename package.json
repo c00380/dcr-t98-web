@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.js",
     "build:codec": "node scripts/build-codec.js",
-    "setup": "npm ci && npm run build",
+    "setup": "node scripts/confirm-codec-notices.js && npm ci && npm run build",
     "start": "node scripts/server.js"
   },
   "devDependencies": {

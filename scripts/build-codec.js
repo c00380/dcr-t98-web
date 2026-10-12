@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { codecRevision as revision } from './codec-source.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const revision = 'd1762813b7142c021f4105c832bf7f060d1249fa';
 function run(program, args, capture = false) {
   const result = spawnSync(program, args, {
     cwd: root,
@@ -21,7 +21,6 @@ if (!existsSync(new URL('../vendor/blip25-vocoder/', import.meta.url))) {
   ]);
 }
 const vendorArgs = ['-C', 'vendor/blip25-vocoder'];
-// Never discard local edits to the vendor library when selecting the pinned version.
 if (run('git', [...vendorArgs, 'status', '--porcelain'], true)) {
   console.error('vendor/blip25-vocoder has local changes. Save or revert them before building.');
   process.exit(1);

@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 const root = fileURLToPath(new URL('../', import.meta.url));
 process.chdir(root);
-// Cargo's incremental build also refreshes the codec when Rust sources change.
 const codec = spawnSync(process.execPath, ['scripts/build-codec.js'], {
   cwd: root,
   stdio: 'inherit',
@@ -39,8 +38,6 @@ await build({
   outfile: 'web/lib/rtlsdr.js',
 });
 copyFileSync('node_modules/@jtarrio/webrtlsdr/LICENSE', 'web/lib/webrtlsdr.LICENSE');
-// Validate every application module, including the separately loaded Worker.
-// Keep serving the original modules; these bundles are only used for validation.
 await build({
   entryPoints: readdirSync('web').filter((name) => name.endsWith('.js')).map((name) => `web/${name}`),
   bundle: true,
