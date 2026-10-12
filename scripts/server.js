@@ -7,12 +7,12 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const assets = sirv(root, { dev: true, extensions: [] });
 function publicPath(url) {
   const name = decodeURIComponent(new URL(url, 'http://localhost').pathname);
-  const path = resolve(root, '.' + (name === '/' ? '/dcr_ui.html' : name));
+  const path = resolve(root, '.' + (name === '/' ? '/index.html' : name));
   const normalized = '/' + relative(root, path).split(sep).join('/');
   if (
     name.includes('\0') ||
     normalized.split('/').some((p) => p.startsWith('.')) ||
-    !(normalized === '/dcr_ui.html' || normalized.startsWith('/web/'))
+    !(normalized === '/index.html' || normalized.startsWith('/web/'))
   )
     return null;
   return normalized;
