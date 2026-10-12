@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>デジ簡モニタ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #111922;
+        --panel2: #0e151d;
+        --line: #22303d;
+        --line2: #1a2530;
+        --ink: #cdd9e3;
+        --mut: #6d8195;
+        --dim: #455666;
+        --accent: #46d17a;
+        --cyan: #4fd0e0;
+        --red: #e5484d;
+        --violet: #9a86ff;
+        --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+        --sans: 'IBM Plex Sans', system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      h3 {
+        margin: 0;
+        font-weight: 600;
+        text-wrap: balance;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+      .mono {
+        font-family: var(--mono);
+        font-variant-numeric: tabular-nums;
+      }
+      .lbl {
+        font-size: 11px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--mut);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+      .rail input[type='file'] {
+        width: 100%;
+        min-width: 0;
+        font-size: 12px;
+      }
+
+      .wrap {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 0;
+        min-height: 100vh;
+      }
+      .rail {
+        background: var(--panel2);
+        border-right: 1px solid var(--line);
+        padding: 18px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .main {
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .brand b {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .brand span {
+        font-size: 11px;
+        color: var(--mut);
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dim);
+        flex: none;
+      }
+      .dot.on {
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+      }
+
+      .grp {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .seg {
+        display: flex;
+        gap: 4px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 3px;
+      }
+      .seg button {
+        flex: 1;
+        border: 0;
+        background: transparent;
+        color: var(--mut);
+        padding: 7px 4px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12.5px;
+        font-weight: 500;
+      }
+      .seg button.sel {
+        background: var(--accent);
+        color: #04180d;
+        font-weight: 600;
+      }
+      .seg button:not(.sel):not(:disabled):hover {
+        color: var(--ink);
+        background: var(--line2);
+      }
+      .seg button:disabled {
+        cursor: not-allowed;
+      }
+      .seg button:disabled:not(.sel) {
+        opacity: 0.3;
+      }
+      select,
+      input[type='text'],
+      input[type='number'] {
+        width: 100%;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: var(--ink);
+      }
+      input:focus,
+      select:focus,
+      button:focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 1px;
+      }
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .hint {
+        font-size: 11px;
+        color: var(--dim);
+      }
+
+      .btn {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        border-radius: 8px;
+        padding: 9px 12px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .btn:not(:disabled):hover {
+        border-color: var(--mut);
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .btn.primary {
+        background: var(--cyan);
+        color: #03181c;
+        border-color: var(--cyan);
+        font-weight: 600;
+      }
+      .btn.rec {
+        background: var(--red);
+        color: #fff;
+        border-color: var(--red);
+        font-weight: 600;
+      }
+      .btn.rec.idle {
+        background: transparent;
+        color: var(--red);
+      }
+      input[type='range'] {
+        width: 100%;
+        accent-color: var(--cyan);
+      }
+
+      .readout {
+        background: linear-gradient(180deg, var(--panel), var(--panel2));
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 18px;
+      }
+      .freq {
+        font-family: var(--mono);
+        font-size: 44px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: var(--cyan);
+        line-height: 1;
+      }
+      .freq small {
+        font-size: 16px;
+        color: var(--mut);
+        margin-left: 6px;
+      }
+      .rd-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .cols {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+      }
+      .cols.single {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .card h3 {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mut);
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      .now {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 8px 16px;
+        align-items: baseline;
+      }
+      .now .k {
+        color: var(--mut);
+        font-size: 12px;
+      }
+      .now .v {
+        font-family: var(--mono);
+        font-size: 15px;
+      }
+      .idlebox {
+        color: var(--dim);
+        font-family: var(--mono);
+        padding: 10px 0;
+      }
+
+      .meter {
+        height: 12px;
+        border-radius: 6px;
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        overflow: hidden;
+      }
+      .meter > i {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--accent), var(--cyan));
+        transition: width 0.12s;
+      }
+      .levels {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 210px;
+        overflow: auto;
+      }
+      .lvrow {
+        display: grid;
+        grid-template-columns: max-content 1fr 46px;
+        gap: 10px;
+        align-items: center;
+      }
+      .lvrow .nm {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--ink);
+      }
+      .lvrow .db {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--mut);
+        text-align: right;
+      }
+
+      .tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--mono);
+        font-size: 12.5px;
+      }
+      .tbl th {
+        text-align: left;
+        color: var(--mut);
+        font-weight: 500;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        background: var(--panel);
+      }
+      .tbl td {
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--line2);
+        white-space: nowrap;
+      }
+      .tblwrap {
+        max-height: 260px;
+        overflow: auto;
+      }
+      .muted {
+        color: var(--mut);
+      }
+      .log {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--mut);
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 96px;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        color: var(--dim);
+        font-size: 11px;
+        padding-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="rail">
+        <div class="brand">
+          <span class="dot" id="dot"></span><b>デジ簡モニタ</b><span>STD-T98</span>
+        </div>
+
+        <div class="grp">
+          <span class="lbl">モード</span>
+          <div class="seg" id="mode">
+            <button data-m="scan" class="sel">スキャン</button>
+            <button data-m="fixed">固定</button>
+            <button data-m="file">ファイル</button>
+            <button data-m="encode">送信</button>
+          </div>
+        </div>
+
+        <div class="grp" id="encode-controls" hidden>
+          <label class="lbl" for="tx-file">音声ファイル</label>
+          <input id="tx-file" type="file" accept=".wav" />
+          <div class="grp">
+            <div class="grp">
+              <label class="lbl" for="tx-csm">識別番号（9桁）</label
+              ><input id="tx-csm" type="text" value="123456789" maxlength="9" inputmode="numeric" />
+            </div>
+            <div class="grp">
+              <label class="lbl" for="tx-key">秘話コード</label
+              ><input id="tx-key" type="text" placeholder="1..32767" inputmode="numeric" />
+            </div>
+            <div class="grp">
+              <label class="lbl" for="tx-uc">UC</label
+              ><input id="tx-uc" type="number" value="1" min="0" max="511" />
+            </div>
+            <div class="grp">
+              <label class="lbl" for="tx-maker">メーカー番号</label
+              ><input id="tx-maker" type="number" value="0" min="0" max="127" />
+            </div>
+            <div class="grp">
+              <label class="lbl" for="tx-format">出力形式</label
+              ><select id="tx-format">
+                <option value="s8">8ビット整数</option>
+                <option value="s16">16ビット整数</option>
+                <option value="f32">32ビット浮動小数点</option>
+              </select>
+            </div>
+            <div class="grp">
+              <label class="lbl" for="tx-rate">サンプルレート</label
+              ><input id="tx-rate" type="number" value="2000000" min="48000" step="1000" />
+            </div>
+          </div>
+          <details style="margin-top: 12px">
+            <summary class="muted">詳細設定</summary>
+            <div class="row2" style="margin-top: 12px">
+              <div class="grp">
+                <label class="lbl" for="tx-offset">周波数オフセット Hz</label
+                ><input id="tx-offset" type="number" value="0" />
+              </div>
+              <div class="grp">
+                <label class="lbl" for="tx-amplitude">信号の振幅</label
+                ><input
+                  id="tx-amplitude"
+                  type="number"
+                  value="0.8"
+                  min="0.01"
+                  max="1"
+                  step="0.01"
+                />
+              </div>
+              <div class="grp">
+                <label class="lbl" for="tx-audio-gain">音声倍率</label
+                ><input id="tx-audio-gain" type="number" value="1" min="0" step="0.1" />
+              </div>
+              <div class="grp">
+                <label class="lbl" for="tx-repeats">追加プリアンブル反復</label
+                ><input id="tx-repeats" type="number" value="12" min="0" max="10000" />
+              </div>
+            </div>
+          </details>
+          <progress
+            id="tx-progress"
+            max="1"
+            value="0"
+            style="width: 100%; margin-top: 12px"
+          ></progress>
+          <div id="tx-status" class="hint mono" role="status" style="overflow-wrap: anywhere">
+            待機中
+          </div>
+        </div>
+
+        <div class="grp" id="file-controls" hidden>
+          <label class="lbl" for="iq-file">I/Qファイル</label>
+          <input id="iq-file" type="file" accept=".bin,.iq,.raw" />
+          <div class="grp">
+            <div class="grp">
+              <label class="lbl" for="iq-format">入力形式</label
+              ><select id="iq-format">
+                <option value="s8">8ビット整数</option>
+                <option value="s16">16ビット整数</option>
+                <option value="f32">32ビット浮動小数点</option>
+              </select>
+            </div>
+            <div class="grp">
+              <label class="lbl" for="iq-rate">サンプルレート</label
+              ><input id="iq-rate" type="number" value="2000000" min="48000" step="any" />
+            </div>
+          </div>
+          <label class="lbl" for="iq-progress"
+            >進捗 <output id="iq-progress-value">0%</output></label
+          >
+          <progress id="iq-progress" max="1" value="0" style="width: 100%"></progress>
+        </div>
+
+        <div class="grp" data-live>
+          <span class="lbl">周波数帯</span>
+          <select id="band"></select>
+        </div>
+
+        <div class="grp" data-live>
+          <span class="lbl">チャンネル（固定時）</span>
+          <select id="chan"></select>
+        </div>
+
+        <div class="grp" data-live>
+          <span class="lbl">任意周波数 MHz（固定時）</span>
+          <input type="text" id="freq" class="mono" inputmode="decimal" />
+          <span class="hint">周波数帯の範囲外も指定可</span>
+        </div>
+
+        <div class="row2" data-receive>
+          <div class="grp">
+            <span class="lbl">秘話コード</span>
+            <input type="text" id="key" class="mono" placeholder="自動" inputmode="numeric" />
+          </div>
+          <div class="grp">
+            <span class="lbl">UCフィルタ</span>
+            <input type="text" id="uc" class="mono" placeholder="全て" inputmode="numeric" />
+          </div>
+        </div>
+        <label
+          class="hint"
+          data-receive
+          style="display: flex; gap: 7px; align-items: center; cursor: pointer"
+        >
+          <input
+            type="checkbox"
+            id="crack"
+            checked
+            style="width: auto; accent-color: var(--violet)"
+          />
+          秘話を自動解読</label
+        >
+
+        <div class="row2" data-live>
+          <div class="grp">
+            <span class="lbl">ゲイン</span
+            ><input type="number" id="gain" class="mono" value="32" min="0" max="49" />
+          </div>
+          <div class="grp">
+            <span class="lbl">しきい値</span
+            ><input type="number" id="gate" class="mono" value="15" min="3" max="40" />
+          </div>
+        </div>
+        <div class="grp" data-live>
+          <span class="lbl">周波数補正 ppm</span
+          ><input type="number" id="ppm" value="0" min="-1000" max="1000" />
+        </div>
+        <button class="btn" id="apply-settings" data-live>設定を適応</button>
+        <button class="btn primary" id="apply">受信開始</button>
+
+        <div data-receive style="border-top: 1px solid var(--line); margin-top: 2px"></div>
+
+        <div class="grp" data-receive>
+          <span class="lbl">音声</span>
+          <button class="btn" id="audiobtn">▶ 音声を開始</button>
+          <div class="mono" id="adiag" style="font-size: 11px; color: var(--mut); line-height: 1.5">
+            —
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span class="lbl" style="flex: none">音量</span>
+            <input type="range" id="vol" min="0" max="150" value="100" />
+            <span
+              class="mono"
+              id="volv"
+              style="width: 38px; text-align: right; color: var(--mut)"
+            ></span>
+          </div>
+        </div>
+
+        <div class="grp" data-receive>
+          <span class="lbl">記録</span>
+          <button class="btn rec idle" id="rec">● 録音</button>
+          <button class="btn" id="savelog">交信ログを保存</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="readout">
+          <div class="rd-meta">
+            <span class="lbl" id="rd-mode">スキャン · 登録局</span>
+            <div class="freq mono"><span id="rd-freq">351.331250</span><small>MHz</small></div>
+            <span class="lbl" id="rd-span">受信範囲 —</span>
+          </div>
+        </section>
+
+        <section class="cols">
+          <div class="card">
+            <h3>受信中</h3>
+            <div id="now"><div class="idlebox">待機中 — 電波を待っています</div></div>
+            <div style="margin-top: 14px">
+              <div class="lbl" style="margin-bottom: 6px">
+                電波強度 <span id="now-ch" class="mono muted"></span>
+              </div>
+              <div class="meter"><i id="sig"></i></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>チャンネル別レベル</h3>
+            <div class="levels" id="levels"><div class="muted mono">—</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>交信ログ</h3>
+          <div class="tblwrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>時刻</th>
+                  <th>チャンネル</th>
+                  <th>周波数（MHz）</th>
+                  <th>通信時間</th>
+                  <th>UC</th>
+                  <th>メーカー番号</th>
+                  <th>識別番号</th>
+                  <th>秘話</th>
+                  <th>秘話コード</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <tr>
+                  <td colspan="9" class="muted">データなし</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <div class="log" id="log"></div>
+          <div class="foot">
+            <span id="conn">未接続</span><span>ホワイトニング: 固定・常時ON（コード無し）</span>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./web/app.js"></script>
+  </body>
+</html>

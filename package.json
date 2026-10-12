@@ -1,0 +1,20 @@
+{
+  "name": "dcr-t98",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:codec": "node scripts/build-codec.js",
+    "setup": "npm ci && npm run build",
+    "start": "node scripts/server.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "dependencies": {
+    "@jtarrio/webrtlsdr": "3.0.6",
+    "fft.js": "^4.0.4",
+    "sirv": "^3.0.2"
+  }
+}
