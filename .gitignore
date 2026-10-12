@@ -3,3 +3,5 @@ node_modules/
 vendor/
 web/codec/
 web/lib/
+.codec-consent.json
+.codec-notices-*/

@@ -2,7 +2,9 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { codecRevision as revision } from './codec-source.js';
+import { ensureCodecConsent } from './codec-consent.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
+ensureCodecConsent();
 function run(program, args, capture = false) {
   const result = spawnSync(program, args, {
     cwd: root,
