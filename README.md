@@ -45,5 +45,12 @@ IQファイルからデコードします。`8-bit int/16-bit int/32-bit float`�
 - RALCWI 方式機は非対応（ソフトウェアコーデックが存在しません）。
 - 秘話解読は音声が流れているフレームが必要です（無音のみでは判定不可）。
 
+## 外部ライブラリ
+- [blip25-vocoder](https://github.com/openBLIP25/blip25-vocoder/)（AMBE+2エンコード・デコード）
+- [webrtlsdr](https://github.com/jtarrio/webrtlsdr/)（WebUSBを用いたRTL-SDRの制御）
+- [fft.js](https://github.com/indutny/fft.js/)（FFT）
+- [esbuild](https://github.com/evanw/esbuild)（JavaScriptのビルド）
+- [sirv](https://github.com/lukeed/sirv)（静的ファイルの配信）
+
 ## ライセンス
 MIT License（`LICENSE` 参照）。
