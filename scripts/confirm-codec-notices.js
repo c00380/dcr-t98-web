@@ -21,13 +21,6 @@ process.once('SIGINT', () => process.exit(130));
 process.once('SIGTERM', () => process.exit(143));
 
 async function readNotice(name) {
-  try {
-    const contents = readFileSync(new URL(`../codec/${name}`, import.meta.url), 'utf8');
-    if (!contents.trim()) throw new Error(`${name} が空です。`);
-    return { contents, source: `codec/${name}` };
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-  }
   const source = `https://raw.githubusercontent.com/OpenBLIP25/blip25-vocoder/${codecRevision}/${name}`;
   console.log(`${name} を取得しています: ${source}`);
   const response = await fetch(source, { signal: AbortSignal.timeout(15000) });
