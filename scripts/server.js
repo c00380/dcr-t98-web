@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(404).end();
   }
 });
-const port = Number(process.env.PORT || 8765);
+const port = Number(process.env.PORT || 8973);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new RangeError('値の範囲が不正です');
 server
   .on('error', (error) => {
